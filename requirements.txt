@@ -1,0 +1,7 @@
+streamlit
+sentence-transformers
+faiss-cpu  # Use faiss-gpu if applicable
+numpy
+pandas
+transformers
+torch
