@@ -6,17 +6,29 @@ import numpy as np
 from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 import os
+import requests
+from io import StringIO
 
 # Set Hugging Face API token
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
-# Upload the CSV file
-uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
+# URL of the CSV file in your GitHub repository (raw file URL)
+csv_url = "https://raw.githubusercontent.com/AbhijeetStudies/NLP-Chatbot-/main/Possible_case_Preprocessing_Small.csv"
 
-if uploaded_file is not None:
-    # Load the CSV file into a pandas DataFrame
-    df = pd.read_csv(uploaded_file)
-    
+# Function to download the CSV file from GitHub
+def load_data_from_github(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        # Use StringIO to read the CSV from the text content
+        return pd.read_csv(StringIO(response.text))
+    else:
+        st.error("Failed to load data from the provided URL.")
+        return None
+
+# Load the CSV file from GitHub
+df = load_data_from_github(csv_url)
+
+if df is not None:
     # Rest of the processing code
     embedding_model = SentenceTransformer("sentence-transformers/all-distilroberta-v1")
     df['combined'] = df['human_clean'] + " " + df['gpt_clean']
